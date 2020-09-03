@@ -11,7 +11,7 @@ import { complexNode } from '../../utilities/complexNode.js';
 import { icon } from '../../utilities/icon.js';
 import { logo } from '../../utilities/logo.js';
 import { form } from '../../utilities/form.js';
-import { button } from '../../utilities/button.js';
+import { Button } from '../../utilities/button.js';
 import { link } from '../../utilities/link.js';
 import { ControlModule_text, ControlModule_inputButton, ControlModule_radio, ControlModule_checkbox, ControlModule_slider, ControlModule_slimSlider, ControlModule_colorMixer, ControlModule_color } from '../../control.js';
 
@@ -56,6 +56,7 @@ menuContentTheme.color = function() {
     id: 'theme-color',
     labelText: 'Primary colour',
     defaultValue: state.get.default().theme.color.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.mod.color.generated();
       theme.render.color.shade();
@@ -170,6 +171,7 @@ menuContentTheme.accent = function() {
     id: 'theme-accent',
     labelText: 'Accent color',
     defaultValue: state.get.default().theme.accent.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.render.accent.color();
       data.save();
@@ -200,6 +202,7 @@ menuContentTheme.bookmark = function() {
     path: 'theme.bookmark.shadow.color.type',
     action: () => {
       theme.render.class();
+      updateDisabled();
       data.save();
     }
   });
@@ -211,6 +214,7 @@ menuContentTheme.bookmark = function() {
     labelText: 'Bookmark shadow colour',
     srOnly: true,
     defaultValue: state.get.default().theme.bookmark.shadow.color.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.render.bookmark.style();
       data.save();
@@ -241,12 +245,27 @@ menuContentTheme.bookmark = function() {
     themeBookmarkShadowColorBy.wrap(),
     form.render.wrap([
       form.render.indent([
+        node('hr'),
         themeBookmarkShadowColor.wrap(),
         node('hr'),
         themeBookmarkShadowOpacity.wrap()
       ])
     ])
   ]));
+
+  const updateDisabled = () => {
+    switch (state.get.current().theme.bookmark.shadow.color.type) {
+      case 'theme':
+        themeBookmarkShadowColor.disable();
+        break;
+
+      case 'custom':
+        themeBookmarkShadowColor.enable();
+        break;
+    };
+  };
+
+  updateDisabled();
 
   return menuContentItem;
 };
@@ -268,6 +287,7 @@ menuContentTheme.background = function() {
     path: 'theme.background.type',
     action: () => {
       theme.render.background.type();
+      updateDisabled();
       data.save();
     }
   });
@@ -278,6 +298,7 @@ menuContentTheme.background = function() {
     id: 'theme-background-color',
     labelText: 'Background colour',
     defaultValue: state.get.default().theme.background.color.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.render.background.style();
       data.save();
@@ -305,6 +326,7 @@ menuContentTheme.background = function() {
     id: 'theme-background-gradient-start',
     labelText: 'Background gradient colour 1',
     defaultValue: state.get.default().theme.background.gradient.start.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.render.background.style();
       data.save();
@@ -317,6 +339,7 @@ menuContentTheme.background = function() {
     id: 'theme-background-gradient-end',
     labelText: 'Background gradient colour 2',
     defaultValue: state.get.default().theme.background.gradient.end.rgb,
+    minMaxObject: state.get.minMax(),
     action: () => {
       theme.render.background.style();
       data.save();
@@ -383,21 +406,75 @@ menuContentTheme.background = function() {
 
   menuContentItem.appendChild(menu.render.component.item.form([
     themeBackgroundType.wrap(),
-    node('hr'),
-    themeBackgroundColorMixer.wrap(),
-    node('hr'),
-    themeBackgroundGradientAngle.wrap(),
-    node('hr'),
-    themeBackgroundGradientStartMixer.wrap(),
-    node('hr'),
-    themeBackgroundGradientEndMixer.wrap(),
-    node('hr'),
-    themeIackgroundImageUrl.wrap(),
-    node('hr'),
-    themeIackgroundImageBlur.wrap(),
-    themeIackgroundImageScale.wrap(),
-    themeIackgroundImageOpacity.wrap()
+    form.render.wrap([
+      form.render.indent([
+        node('hr'),
+        themeBackgroundColorMixer.wrap(),
+        node('hr'),
+        themeBackgroundGradientAngle.wrap(),
+        node('hr'),
+        themeBackgroundGradientStartMixer.wrap(),
+        node('hr'),
+        themeBackgroundGradientEndMixer.wrap(),
+        node('hr'),
+        themeIackgroundImageUrl.wrap(),
+        node('hr'),
+        themeIackgroundImageBlur.wrap(),
+        themeIackgroundImageScale.wrap(),
+        themeIackgroundImageOpacity.wrap()
+      ])
+    ])
   ]));
+
+  const updateDisabled = () => {
+    switch (state.get.current().theme.background.type) {
+      case 'theme':
+        themeBackgroundColorMixer.disable();
+        themeBackgroundGradientAngle.disable();
+        themeBackgroundGradientStartMixer.disable();
+        themeBackgroundGradientEndMixer.disable();
+        themeIackgroundImageUrl.disable();
+        themeIackgroundImageBlur.disable();
+        themeIackgroundImageScale.disable();
+        themeIackgroundImageOpacity.disable();
+        break;
+
+      case 'color':
+        themeBackgroundColorMixer.enable();
+        themeBackgroundGradientAngle.disable();
+        themeBackgroundGradientStartMixer.disable();
+        themeBackgroundGradientEndMixer.disable();
+        themeIackgroundImageUrl.disable();
+        themeIackgroundImageBlur.disable();
+        themeIackgroundImageScale.disable();
+        themeIackgroundImageOpacity.disable();
+        break;
+
+      case 'gradient':
+        themeBackgroundColorMixer.disable();
+        themeBackgroundGradientAngle.enable();
+        themeBackgroundGradientStartMixer.enable();
+        themeBackgroundGradientEndMixer.enable();
+        themeIackgroundImageUrl.disable();
+        themeIackgroundImageBlur.disable();
+        themeIackgroundImageScale.disable();
+        themeIackgroundImageOpacity.disable();
+        break;
+
+      case 'image':
+        themeBackgroundColorMixer.disable();
+        themeBackgroundGradientAngle.disable();
+        themeBackgroundGradientStartMixer.disable();
+        themeBackgroundGradientEndMixer.disable();
+        themeIackgroundImageUrl.enable();
+        themeIackgroundImageBlur.enable();
+        themeIackgroundImageScale.enable();
+        themeIackgroundImageOpacity.enable();
+        break;
+    };
+  };
+
+  updateDisabled();
 
   return menuContentItem;
 };

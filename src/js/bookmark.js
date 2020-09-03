@@ -8,7 +8,7 @@ import { ControlModule_groupText, ControlModule_radio, ControlModule_checkbox, C
 import { node } from './utilities/node.js';
 import { complexNode } from './utilities/complexNode.js';
 import { form } from './utilities/form.js';
-import { button } from './utilities/button.js';
+import { Button } from './utilities/button.js';
 import { convertColor } from './utilities/convertColor.js';
 import { ifValidString } from './utilities/ifValidString.js';
 import { trimString } from './utilities/trimString.js';
@@ -414,7 +414,7 @@ bookmark.render.item = function() {
 
     const control = node('div|class:bookmark-control form-group');
 
-    const controlLeft = button.render({
+    const controlLeft = new Button({
       text: 'Move this bookmark left',
       srOnly: true,
       iconName: 'arrowKeyboardLeft',
@@ -436,7 +436,7 @@ bookmark.render.item = function() {
       }
     });
 
-    const controlRight = button.render({
+    const controlRight = new Button({
       text: 'Move this bookmark right',
       srOnly: true,
       iconName: 'arrowKeyboardRight',
@@ -458,7 +458,7 @@ bookmark.render.item = function() {
       }
     });
 
-    const controlEdit = button.render({
+    const controlEdit = new Button({
       text: 'Edit this bookmark',
       srOnly: true,
       iconName: 'edit',
@@ -485,7 +485,7 @@ bookmark.render.item = function() {
       }
     });
 
-    const controlRemove = button.render({
+    const controlRemove = new Button({
       text: 'Remove this bookmark',
       srOnly: true,
       iconName: 'cross',
@@ -518,10 +518,11 @@ bookmark.render.item = function() {
       }
     });
 
-    control.appendChild(controlLeft);
-    control.appendChild(controlRight);
-    control.appendChild(controlEdit);
-    control.appendChild(controlRemove);
+    control.appendChild(controlLeft.button);
+    control.appendChild(controlRight.button);
+    control.appendChild(controlEdit.button);
+    control.appendChild(controlRemove.button);
+
     contentWrap.appendChild(control);
 
     gridList.appendChild(bookmarkElement);
@@ -590,65 +591,49 @@ bookmark.form = function(bookmarkData) {
 
   bookmarkForm.disableForm = () => {
     if (bookmarkData.link.display.visual.show) {
-      displayVisualType.radioSet[0].radio.disabled = false;
-      displayVisualTypeLetter.text.disabled = false;
-      displayVisualType.radioSet[1].radio.disabled = false;
-      displayVisualTypeIcon.text.disabled = false;
-      displayVisualTypeIconDisplay.groupText.classList.remove('disabled');
-      displayVisualTypeIconRemove.disabled = false;
-      displayVisualType.radioSet[2].radio.disabled = false;
-      displayVisualTypeImage.text.disabled = true;
-      displayVisualSize.label.classList.remove('disabled');
-      displayVisualSize.range.disabled = false;
-      displayVisualSize.number.disabled = false;
-      displayVisualSize.reset.disabled = false;
+      displayVisualType.enable();
+      displayVisualTypeLetter.enable();
+      displayVisualTypeIcon.enable();
+      displayVisualTypeIconDisplay.enable();
+      displayVisualTypeIconRemove.enable();
+      displayVisualTypeImage.enable();
+      displayVisualSize.enable();
     } else {
-      displayVisualType.radioSet[0].radio.disabled = true;
-      displayVisualTypeLetter.text.disabled = true;
-      displayVisualType.radioSet[1].radio.disabled = true;
-      displayVisualTypeIcon.text.disabled = true;
-      displayVisualTypeIconDisplay.groupText.classList.add('disabled');
-      displayVisualTypeIconRemove.disabled = true;
-      displayVisualType.radioSet[2].radio.disabled = true;
-      displayVisualTypeImage.text.disabled = true;
-      displayVisualSize.label.classList.add('disabled');
-      displayVisualSize.range.disabled = true;
-      displayVisualSize.number.disabled = true;
-      displayVisualSize.reset.disabled = true;
+      displayVisualType.disable();
+      displayVisualTypeLetter.disable();
+      displayVisualTypeIcon.disable();
+      displayVisualTypeIconDisplay.disable();
+      displayVisualTypeIconRemove.disable();
+      displayVisualTypeImage.disable();
+      displayVisualSize.disable();
     };
 
     if (bookmarkData.link.display.visual.show && bookmarkData.link.display.visual.type === 'letter') {
-      displayVisualTypeLetter.text.disabled = false;
-      displayVisualTypeIcon.text.disabled = true;
-      displayVisualTypeIconDisplay.groupText.classList.add('disabled');
-      displayVisualTypeIconRemove.disabled = true;
-      displayVisualTypeImage.text.disabled = true;
+      displayVisualTypeLetter.enable();
+      displayVisualTypeIcon.disable();
+      displayVisualTypeIconDisplay.disable()
+      displayVisualTypeIconRemove.disable();
+      displayVisualTypeImage.disable();
     } else if (bookmarkData.link.display.visual.show && bookmarkData.link.display.visual.type === 'icon') {
-      displayVisualTypeLetter.text.disabled = true;
-      displayVisualTypeIcon.text.disabled = false;
-      displayVisualTypeIconDisplay.groupText.classList.remove('disabled');
-      displayVisualTypeIconRemove.disabled = false;
-      displayVisualTypeImage.text.disabled = true;
+      displayVisualTypeLetter.disable();
+      displayVisualTypeIcon.enable();
+      displayVisualTypeIconDisplay.enable();
+      displayVisualTypeIconRemove.enable();
+      displayVisualTypeImage.disable();
     } else if (bookmarkData.link.display.visual.show && bookmarkData.link.display.visual.type === 'image') {
-      displayVisualTypeLetter.text.disabled = true;
-      displayVisualTypeIcon.text.disabled = true;
-      displayVisualTypeIconDisplay.groupText.classList.add('disabled');
-      displayVisualTypeIconRemove.disabled = true;
-      displayVisualTypeImage.text.disabled = false;
+      displayVisualTypeLetter.disable();
+      displayVisualTypeIcon.disable();
+      displayVisualTypeIconDisplay.disable()
+      displayVisualTypeIconRemove.disable();
+      displayVisualTypeImage.enable();
     };
 
     if (bookmarkData.link.display.name.show) {
-      displayNameText.text.disabled = false;
-      displayNameSize.label.classList.remove('disabled');
-      displayNameSize.range.disabled = false;
-      displayNameSize.number.disabled = false;
-      displayNameSize.reset.disabled = false;
+      displayNameText.enable();
+      displayNameSize.enable();
     } else {
-      displayNameText.text.disabled = true;
-      displayNameSize.label.classList.add('disabled');
-      displayNameSize.range.disabled = true;
-      displayNameSize.number.disabled = true;
-      displayNameSize.reset.disabled = true;
+      displayNameText.disable();
+      displayNameSize.disable();
     };
   };
 
@@ -712,7 +697,7 @@ bookmark.form = function(bookmarkData) {
     classList: ['bookmark-form-text-icon']
   });
 
-  const displayVisualTypeIconRemove = button.render({
+  const displayVisualTypeIconRemove = new Button({
     text: 'Remove icon',
     srOnly: true,
     style: ['line'],
@@ -776,53 +761,49 @@ bookmark.form = function(bookmarkData) {
     labelText: 'URL'
   });
 
-  const displayVisualTypeWrap = form.render.wrap(form.render.wrap([
+  const displayVisualTypeWrap = form.render.wrap([
     form.render.indent([
-      form.render.wrap([
-        displayVisualShow.wrap(),
-        form.render.indent([
-          form.render.wrap([
-            displayVisualType.radioSet[0].radio,
-            displayVisualType.radioSet[0].label
-          ]),
-          form.render.wrap([
-            form.render.indent([
-              displayVisualTypeLetter.wrap()
-            ])
-          ]),
-          form.render.wrap([
-            displayVisualType.radioSet[1].radio,
-            displayVisualType.radioSet[1].label
-          ]),
-          form.render.wrap([
-            form.render.indent([
-              form.render.wrap([
-                displayVisualTypeIcon.label,
-                form.render.group([
-                  displayVisualTypeIcon.text,
-                  displayVisualTypeIconDisplay.groupText,
-                  displayVisualTypeIconRemove
-                ])
+      displayVisualShow.wrap(),
+      form.render.indent([
+        form.render.wrap([
+          displayVisualType.radioSet[0].radio,
+          displayVisualType.radioSet[0].label
+        ]),
+        form.render.wrap([
+          form.render.indent([
+            displayVisualTypeLetter.wrap()
+          ])
+        ]),
+        form.render.wrap([
+          displayVisualType.radioSet[1].radio,
+          displayVisualType.radioSet[1].label
+        ]),
+        form.render.wrap([
+          form.render.indent([
+            form.render.wrap([
+              displayVisualTypeIcon.label,
+              form.render.group([
+                displayVisualTypeIcon.text,
+                displayVisualTypeIconDisplay.groupText,
+                displayVisualTypeIconRemove.button
               ])
             ])
-          ]),
-          form.render.wrap([
-            displayVisualType.radioSet[2].radio,
-            displayVisualType.radioSet[2].label
-          ]),
-          form.render.wrap([
-            form.render.indent([
-              displayVisualTypeImage.wrap()
-            ])
-          ]),
-          node('hr'),
-          form.render.wrap([
-            displayVisualSize.wrap()
           ])
-        ])
-      ]),
+        ]),
+        form.render.wrap([
+          displayVisualType.radioSet[2].radio,
+          displayVisualType.radioSet[2].label
+        ]),
+        form.render.wrap([
+          form.render.indent([
+            displayVisualTypeImage.wrap()
+          ])
+        ]),
+        node('hr'),
+        displayVisualSize.wrap()
+      ])
     ])
-  ]));
+  ]);
 
   bookmarkForm.appendChild(
     form.render.fieldset([
@@ -852,9 +833,7 @@ bookmark.form = function(bookmarkData) {
       ]),
       form.render.wrap([
         form.render.indent([
-          form.render.wrap([
-            url.wrap()
-          ])
+          url.wrap()
         ])
       ])
     ])
